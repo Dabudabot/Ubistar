@@ -1,0 +1,2 @@
+# Ubistar
+A* algorithm implementation
