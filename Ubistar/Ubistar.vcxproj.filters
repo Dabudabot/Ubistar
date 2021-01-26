@@ -21,9 +21,15 @@
     <ClCompile Include="u_astar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="u_world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="u_astar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="u_world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

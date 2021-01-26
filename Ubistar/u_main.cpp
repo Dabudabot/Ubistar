@@ -90,8 +90,7 @@ int _tmain(int argc, TCHAR* argv[])
 
   unique_ptr<AStar> pathFinder = make_unique<AStar>(mapPath, MAP_COLS, MAP_ROWS, showmap);
   auto result = pathFinder->FindPath(startX, startY, endX, endY);
-
-  cout << pathFinder << endl;
+  pathFinder->Print();
 }
 
 /************************************************
@@ -143,7 +142,7 @@ InputTuple ProcessInput(const int& argc, TCHAR* argv[])
   BOOL showmap = false;
 
   // do we have last arg?
-  if (MAX_INPUT_AMOUNT == argc && _tcscmp(argv[6], SHOW_MAP))
+  if (MAX_INPUT_AMOUNT == argc && !_tcscmp(argv[6], SHOW_MAP))
   {
     showmap = true;
   }

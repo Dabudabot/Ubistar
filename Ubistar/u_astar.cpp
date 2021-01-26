@@ -30,7 +30,7 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
     m_PathFound = false;
 
     auto end = high_resolution_clock::now();
-    m_Duration = duration_cast<milliseconds>(end - start).count();
+    m_Duration = duration_cast<microseconds>(end - start).count() / 1000.0;
     m_Cost = 0;
 
     return m_PathFound;
@@ -41,14 +41,24 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
   m_Start->SetTravelCost(0.0f);
   m_Start->MarkAsPath();
 
-  priority_queue<Coordinate*> open;
+  auto cmp = [](Coordinate* l, Coordinate* r)
+  {
+    if (l->GetTotalCost() == r->GetTotalCost())
+    {
+      return l->GetH() > r->GetH();
+    }
+
+    return l->GetTotalCost() > r->GetTotalCost();
+  };
+
+  priority_queue<Coordinate*, vector<Coordinate*>, decltype(cmp)> open(cmp);
 
   open.push(m_Start);
-  Coordinate* current;
+  Coordinate* current = nullptr;
 
   while (!open.empty())
   {
-    Coordinate* current = open.top();
+    current = open.top();
 
     if (current == m_End)
     {
@@ -65,13 +75,13 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
 
       if (!neighbour) continue;
 
-      auto newG = CalcG(current, direction);
+      auto newG = CalcG(current->GetG(), neighbour->GetTerrainCost(), direction);
 
       if (!neighbour->IsVisited() || newG < neighbour->GetG())
       {
         neighbour->SetG(newG);
         neighbour->SetParent(current);
-        neighbour->SetTravelCost(CalcT(neighbour, direction));
+        neighbour->SetTravelCost(newG - current->GetG());
       }
 
       if (!neighbour->IsVisited())
@@ -87,14 +97,15 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
   {
     do
     {
+      if (nullptr == current) break;
       current->MarkAsPath();
       m_Cost += current->GetTravelCost();
       current = current->GetParent();
     } while (current != m_Start);
   }
 
-  auto end = std::chrono::high_resolution_clock::now();
-  m_Duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+  auto end = high_resolution_clock::now();
+  m_Duration = duration_cast<microseconds>(end - start).count() / 1000.0;
 
   return m_PathFound;
 }
@@ -106,7 +117,7 @@ FLOAT AStar::CalcH(const Coordinate* const start, const Coordinate* const end)
   return static_cast<FLOAT>(m_Weight * sqrt((x * x) + (y * y)));
 }
 
-FLOAT AStar::CalcT(const Coordinate* const current, const DIRECTION& direction)
+FLOAT AStar::CalcG(const FLOAT& currentG, const FLOAT& neighbourT, const DIRECTION& direction)
 {
   switch (direction)
   {
@@ -114,52 +125,35 @@ FLOAT AStar::CalcT(const Coordinate* const current, const DIRECTION& direction)
   case DIRECTION::E:
   case DIRECTION::S:
   case DIRECTION::W:
-    return current->GetTerrainCost() + m_Weight;
+    return currentG + (neighbourT * m_Weight);
     break;
   case DIRECTION::NE:
   case DIRECTION::ES:
   case DIRECTION::SW:
   case DIRECTION::WN:
-    return current->GetTerrainCost() + m_DiagWeight;
+    return currentG + (neighbourT * m_DiagWeight);
     break;
   }
+
+  return 0;
 }
 
-FLOAT AStar::CalcG(const Coordinate* const current, const DIRECTION& direction)
+VOID AStar::Print()
 {
-  switch (direction)
+  cout << endl;
+
+  cout << "Start position: (" << static_cast<INT>(GetLastStart()->GetX()) 
+    << ", " << static_cast<INT>(GetLastStart()->GetY()) << ")" << endl;
+  cout << "End position: (" << static_cast<INT>(GetLastEnd()->GetX())
+    << ", " << static_cast<INT>(GetLastEnd()->GetY()) << ")" << endl << endl;
+
+  cout << "Path found: " << (IsLastFound() ? "true" : "false") << endl;
+  cout << "Path cost: " << GetLastCost() << endl << endl;
+
+  cout << "Total duration: " << GetLastDuration() << " ms" << endl;
+
+  if (IsMapShown())
   {
-  case DIRECTION::N:
-  case DIRECTION::E:
-  case DIRECTION::S:
-  case DIRECTION::W:
-    return current->GetG() + m_Weight;
-    break;
-  case DIRECTION::NE:
-  case DIRECTION::ES:
-  case DIRECTION::SW:
-  case DIRECTION::WN:
-    return current->GetG() + m_DiagWeight;
-    break;
+    m_World->Print();
   }
-}
-
-std::ostream& ubistar::operator<<(std::ostream& os, const AStar& a)
-{
-  os << endl;
-
-  os << "Start position: " << a.GetLastStart() << endl;
-  os << "End position: " << a.GetLastEnd() << endl << endl;
-
-  os << "Path found: " << (a.IsLastFound() ? "true" : "false") << endl;
-  os << "Path cost: " << a.GetLastCost() << endl << endl;
-
-  os << "Total duration: " << a.GetLastDuration() << endl;
-
-  if (a.IsMapShown())
-  {
-    os << endl << a.m_World << endl;
-  }
-
-  return os;
 }

@@ -24,13 +24,12 @@ namespace ubistar
     Coordinate* GetLastEnd() const { return m_End; }
     DOUBLE GetLastCost() const { return m_Cost; }
 
-    friend std::ostream& operator<<(std::ostream& os, const AStar& a);
+    VOID Print();
 
   private:
 
-    FLOAT CalcT(const Coordinate* const current, const DIRECTION& direction);
     FLOAT CalcH(const Coordinate* const start, const Coordinate* const end);
-    FLOAT CalcG(const Coordinate* const current, const DIRECTION& direction);
+    FLOAT CalcG(const FLOAT& currentG, const FLOAT& neighbourT, const DIRECTION& direction);
 
     std::unique_ptr<World> m_World;
 

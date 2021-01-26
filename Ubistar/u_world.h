@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <tchar.h>
 #include <string>
 #include <vector>
 
@@ -59,8 +60,8 @@ namespace ubistar
     BOOL IsChoosen() const { return m_Choosen; }
     Coordinate* GetParent() const { return m_Parent; }
 
-    VOID SetData(BYTE x, BYTE y, CHAR type);
-    VOID SetTerrain(CHAR type);
+    VOID SetData(BYTE x, BYTE y, TCHAR type);
+    VOID SetTerrain(TCHAR type);
     VOID SetCoords(BYTE x, BYTE y);
     VOID ResetValue();
     VOID MarkAsVisited() { m_Visited = true; }
@@ -73,10 +74,6 @@ namespace ubistar
     FLOAT GetTravelCost() { return m_TravelCost; }
 
     VOID MarkAsPath() { m_Path = true; }
-
-    friend std::ostream& operator<<(std::ostream& os, const Coordinate& c);
-    friend bool operator< (const Coordinate& a, const Coordinate& b);
-    friend bool operator==(const Coordinate& a, const Coordinate& b);
 
   private:
 
@@ -101,17 +98,16 @@ namespace ubistar
   {
   public:
 
-    World(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols);
+    World(std::basic_string<TCHAR> mapPath, size_t mapRows, size_t mapCols);
 
     Coordinate* GetCoord(const BYTE& x, const BYTE& y);
     Coordinate* GetNeighbour(const Coordinate* const current, DIRECTION direction);
     VOID ResetValues();
-
-    friend std::ostream& operator<<(std::ostream& os, const World& c);
+    VOID Print();
 
   private:
-    BYTE m_MapRows;
-    BYTE m_MapCols;
+    size_t m_MapRows;
+    size_t m_MapCols;
     std::vector<Coordinate> m_Coordinates;
   };
 }
