@@ -13,7 +13,7 @@ namespace ubistar
   public:
 
     AStar(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap);
-    ~AStar();
+    ~AStar() = default;
 
     BOOL FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY);
 
@@ -24,9 +24,7 @@ namespace ubistar
     Coordinate* GetLastEnd() const { return m_End; }
     DOUBLE GetLastCost() const { return m_Cost; }
 
-    VOID SetMapVisibility(BOOL showmap);
-
-    friend ostream& operator<<(ostream& os, const AStar& a);
+    friend std::ostream& operator<<(std::ostream& os, const AStar& a);
 
   private:
 

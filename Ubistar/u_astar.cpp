@@ -15,11 +15,6 @@ AStar::AStar(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols, BOOL 
   m_DiagWeight = sqrt(2 * m_Weight * m_Weight);
 }
 
-VOID AStar::SetMapVisibility(BOOL showmap)
-{
-  m_ShowMap = showmap;
-}
-
 BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
 {
   auto start = high_resolution_clock::now();
@@ -149,44 +144,7 @@ FLOAT AStar::CalcG(const Coordinate* const current, const DIRECTION& direction)
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-bool operator == (const Coordinate& lhs, const Coordinate& rhs)
-{
-  return lhs.GetX() == rhs.GetX() && lhs.GetY() == rhs.GetY();
-}
-
-bool operator < (const Coordinate& lhs, const Coordinate& rhs)
-{
-  if (lhs.GetTotalCost() == rhs.GetTotalCost())
-  {
-    return lhs.GetH() < rhs.GetH();
-  }
-
-  return lhs.GetTotalCost() < rhs.GetTotalCost();
-}
-
-ostream& operator<<(ostream& os, const Coordinate& c)
-{
-  os << "(" << c.GetX() << ", " << c.GetY() << ")";
-
-  return os;
-}
-
-ostream& operator<<(ostream& os, const AStar& a)
+std::ostream& ubistar::operator<<(std::ostream& os, const AStar& a)
 {
   os << endl;
 
@@ -197,6 +155,11 @@ ostream& operator<<(ostream& os, const AStar& a)
   os << "Path cost: " << a.GetLastCost() << endl << endl;
 
   os << "Total duration: " << a.GetLastDuration() << endl;
+
+  if (a.IsMapShown())
+  {
+    os << endl << a.m_World << endl;
+  }
 
   return os;
 }

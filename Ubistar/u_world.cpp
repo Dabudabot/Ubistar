@@ -55,6 +55,25 @@ VOID Coordinate::SetTerrain(CHAR type)
   }
 }
 
+CHAR Coordinate::GetTerrainTypeAsSym() const
+{
+  if (m_Path) return '+';
+
+  switch (m_TerrainType)
+  {
+  case TERRAIN_TYPE::PLAIN:
+    return '.';
+  case TERRAIN_TYPE::WATER:
+    return '*';
+  case TERRAIN_TYPE::SWAMP:
+    return '-';
+  case TERRAIN_TYPE::MOUNTAIN:
+    return '^';
+  default:
+    return ' ';
+  }
+}
+
 VOID Coordinate::ResetValue()
 {
   m_g = 0.0f;
@@ -63,31 +82,6 @@ VOID Coordinate::ResetValue()
   m_Choosen = false;
   m_Path = false;
   m_Parent = nullptr;
-}
-
-VOID Coordinate::MarkAsVisited()
-{
-  m_Visited = true;
-}
-
-VOID Coordinate::MarkAsChoosen()
-{
-  m_Choosen = true;
-}
-
-VOID Coordinate::SetG(FLOAT g)
-{
-  m_g = g;
-}
-
-VOID Coordinate::SetParent(Coordinate* parent)
-{
-  m_Parent = parent;
-}
-
-VOID Coordinate::SetH(FLOAT h)
-{
-  m_h = h;
 }
 
 World::World(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols)
@@ -203,5 +197,39 @@ VOID World::ResetValues()
   for (auto& coord : m_Coordinates)
   {
     coord.ResetValue();
+  }
+}
+
+ostream& ubistar::operator<<(ostream& os, const Coordinate& c)
+{
+  os << "(" << c.GetX() << ", " << c.GetY() << ")";
+
+  return os;
+}
+
+bool ubistar::operator<(const Coordinate& a, const Coordinate& b)
+{
+  if (a.GetTotalCost() == b.GetTotalCost())
+  {
+    return a.GetH() < b.GetH();
+  }
+
+  return a.GetTotalCost() < b.GetTotalCost();
+}
+
+bool ubistar::operator==(const Coordinate& a, const Coordinate& b)
+{
+  return a.GetX() == b.GetX() && a.GetY() == b.GetY();
+}
+
+ostream& ubistar::operator<<(ostream& os, const World& c)
+{
+  for (size_t y = 0; y < c.m_MapRows; y++)
+  {
+    for (size_t x = 0; x < c.m_MapCols; x++)
+    {
+      os << c.m_Coordinates[(c.m_MapRows * y) + x].GetTerrainTypeAsSym();
+    }
+    os << endl;
   }
 }

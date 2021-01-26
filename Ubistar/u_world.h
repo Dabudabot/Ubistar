@@ -54,6 +54,7 @@ namespace ubistar
     FLOAT GetTotalCost() const;
     FLOAT GetTerrainCost() const { return m_TerrainCost; }
     TERRAIN_TYPE GetTerrainType() const { return m_TerrainType; }
+    CHAR GetTerrainTypeAsSym() const;
     BOOL IsVisited() const { return m_Visited; }
     BOOL IsChoosen() const { return m_Choosen; }
     Coordinate* GetParent() const { return m_Parent; }
@@ -62,18 +63,18 @@ namespace ubistar
     VOID SetTerrain(CHAR type);
     VOID SetCoords(BYTE x, BYTE y);
     VOID ResetValue();
-    VOID MarkAsVisited();
-    VOID MarkAsChoosen();
-    VOID SetG(FLOAT g);
-    VOID SetParent(Coordinate* parent);
-    VOID SetH(FLOAT h);
+    VOID MarkAsVisited() { m_Visited = true; }
+    VOID MarkAsChoosen() { m_Choosen = true; }
+    VOID SetG(FLOAT g) { m_g = g; }
+    VOID SetParent(Coordinate* parent) { m_Parent = parent; }
+    VOID SetH(FLOAT h) { m_h = h; }
 
     VOID SetTravelCost(FLOAT cost) { m_TravelCost = cost; }
     FLOAT GetTravelCost() { return m_TravelCost; }
 
     VOID MarkAsPath() { m_Path = true; }
 
-    friend ostream& operator<<(ostream& os, const Coordinate& c);
+    friend std::ostream& operator<<(std::ostream& os, const Coordinate& c);
     friend bool operator< (const Coordinate& a, const Coordinate& b);
     friend bool operator==(const Coordinate& a, const Coordinate& b);
 
@@ -103,14 +104,14 @@ namespace ubistar
     World(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols);
 
     Coordinate* GetCoord(const BYTE& x, const BYTE& y);
-    BOOL IsValid(const Coordinate& c);
     Coordinate* GetNeighbour(const Coordinate* const current, DIRECTION direction);
     VOID ResetValues();
+
+    friend std::ostream& operator<<(std::ostream& os, const World& c);
 
   private:
     BYTE m_MapRows;
     BYTE m_MapCols;
     std::vector<Coordinate> m_Coordinates;
-
   };
 }
