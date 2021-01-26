@@ -1,17 +1,37 @@
+/*!
+ *  \brief     A* algorithm impl
+ *  \author    Daulet Tumbayev
+ *  \date      2021
+ */
+
+ /************************************************
+  *  Includes
+  ***********************************************/
+
 #include "u_astar.h"
 
 #include <chrono>
 #include <queue>
 #include <iostream>
 
+  /************************************************
+   *  Namespaces
+   ***********************************************/
+
 using namespace ubistar;
 using namespace std;
 using namespace chrono;
+
+/************************************************
+ *  AStar class impl
+ ***********************************************/
 
 AStar::AStar(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap)
   : m_Weight(1.0f), m_ShowMap(showmap), m_Duration(0), m_Cost(0), m_PathFound(false)
 {
   m_World = make_unique<World>(mapPath, mapRows, mapCols);
+
+  // Pifagor`s formula
   m_DiagWeight = sqrt(2 * m_Weight * m_Weight);
 }
 
@@ -22,6 +42,7 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
   m_Start = m_World->GetCoord(startX, startY);
   m_End = m_World->GetCoord(endX, endY);
 
+  // check initially, do we have to do anything
   if (m_Start->GetTerrainType() == TERRAIN_TYPE::UNDEFINED || 
     m_Start->GetTerrainType() == TERRAIN_TYPE::WATER ||
     m_End->GetTerrainType() == TERRAIN_TYPE::UNDEFINED ||
@@ -38,9 +59,12 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
 
   m_World->ResetValues();
 
+  // initial start cell is not counted, we already reach it
   m_Start->SetTravelCost(0.0f);
   m_Start->MarkAsPath();
 
+  // comparator for priority queue
+  // we go for the cell with lowest cost
   auto cmp = [](Coordinate* l, Coordinate* r)
   {
     if (l->GetTotalCost() == r->GetTotalCost())
@@ -58,6 +82,7 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
 
   while (!open.empty())
   {
+    // pick the best option (it is on the top)
     current = open.top();
 
     if (current == m_End)
@@ -69,14 +94,17 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
     open.pop();
     current->MarkAsChoosen();
 
+    // iterate all possible neighbours
     for (const auto& direction : DIRECTIONS)
     {
       auto neighbour = m_World->GetNeighbour(current, direction);
 
       if (!neighbour) continue;
 
+      // calculate G value
       auto newG = CalcG(current->GetG(), neighbour->GetTerrainCost(), direction);
 
+      // update G value if we found better path, or we first time visit this cell
       if (!neighbour->IsVisited() || newG < neighbour->GetG())
       {
         neighbour->SetG(newG);
@@ -84,6 +112,7 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
         neighbour->SetTravelCost(newG - current->GetG());
       }
 
+      // if we first time visit just mark it
       if (!neighbour->IsVisited())
       {
         neighbour->SetH(CalcH(neighbour, m_End));
@@ -95,6 +124,7 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
 
   if (m_PathFound)
   {
+    // trace back
     do
     {
       if (nullptr == current) break;

@@ -1,10 +1,28 @@
+/*!
+ *  \brief     World impl
+ *  \author    Daulet Tumbayev
+ *  \date      2021
+ */
+
+ /************************************************
+  *  Includes
+  ***********************************************/
+
 #include "u_world.h"
 
 #include <fstream>
 #include <iostream>
 
+  /************************************************
+   *  Namespaces
+   ***********************************************/
+
 using namespace ubistar;
 using namespace std;
+
+/************************************************
+ *  Corrdinates class impl
+ ***********************************************/
 
 Coordinate::Coordinate()
   : m_x(0), m_y(0), m_g(0), m_h(0),
@@ -86,6 +104,10 @@ VOID Coordinate::ResetValue()
   m_Parent = nullptr;
 }
 
+/************************************************
+ *  World class impl
+ ***********************************************/
+
 World::World(std::basic_string<TCHAR> mapPath, size_t mapRows, size_t mapCols)
   : m_MapRows(mapRows), m_MapCols(mapCols), m_Coordinates(mapRows * mapCols, Coordinate())
 {
@@ -99,6 +121,7 @@ World::World(std::basic_string<TCHAR> mapPath, size_t mapRows, size_t mapCols)
 
   while (infile >> symbol)
   {
+    // match coordinates and indexes
     m_Coordinates[(mapRows * currentY) + currentX].SetData(currentX, currentY, symbol);
     currentX++;
     if (currentX == mapCols)
@@ -184,6 +207,7 @@ Coordinate* World::GetNeighbour(const Coordinate* const current, DIRECTION direc
   break;
   }
 
+  // no return if this neighbout is not valid
   if (m_Coordinates[(m_MapRows * y) + x].GetTerrainType() == TERRAIN_TYPE::WATER ||
     m_Coordinates[(m_MapRows * y) + x].GetTerrainType() == TERRAIN_TYPE::UNDEFINED ||
     m_Coordinates[(m_MapRows * y) + x].IsChoosen())

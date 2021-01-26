@@ -40,17 +40,17 @@ constexpr BYTE MAP_COLS = 126;
  *  Forward declaration
  ***********************************************/
 
- /*!
- *  Processing input
- *  \param argc equals to 6 or 7
- *  \param argv contains the following pattern:
- *              astar.exe MapFileName StartX StartY EndX EndY [showmap]
- *              where MapFileName - path to file with map (read more in README)
- *                    StartX StartY - start position
- *                    EndX EndY - end position
- *                    showmap - if specified, show the output map
- *  \return tuple with inputs {MapFileName, StartX, StartY, EndX, EndY, showmap}
- */
+/*!
+*  Processing input
+*  \param argc equals to 6 or 7
+*  \param argv contains the following pattern:
+*              astar.exe MapFileName StartX StartY EndX EndY [showmap]
+*              where MapFileName - path to file with map (read more in README)
+*                    StartX StartY - start position
+*                    EndX EndY - end position
+*                    showmap - if specified, show the output map
+*  \return tuple with inputs {MapFileName, StartX, StartY, EndX, EndY, showmap}
+*/
 InputTuple ProcessInput(const int& argc, TCHAR* argv[]);
 
 /************************************************
@@ -78,6 +78,7 @@ int _tmain(int argc, TCHAR* argv[])
   BYTE endY;
   BOOL showmap;
 
+  // checking inputs
   try
   {
     tie(mapPath, startX, startY, endX, endY, showmap) = ProcessInput(argc, argv);
@@ -88,8 +89,12 @@ int _tmain(int argc, TCHAR* argv[])
     return ERROR_INVALID_DATA;
   }
 
+  // TODO need to make abstact class IPathider in order to communicate via interfaces, not realisation
+  // TODO need to make AStar class - template to operate with map size (now it is BYTE) in case if it will be larger
   unique_ptr<AStar> pathFinder = make_unique<AStar>(mapPath, MAP_COLS, MAP_ROWS, showmap);
   auto result = pathFinder->FindPath(startX, startY, endX, endY);
+
+  // TODO better to overload << operator, refactor later
   pathFinder->Print();
 }
 
@@ -97,6 +102,13 @@ int _tmain(int argc, TCHAR* argv[])
  *  Functions impl
  ***********************************************/
 
+ /*!
+ *  Number checking goes here
+ *  \param input number as a string
+ *  \param min lower bound
+ *  \param max upper bound
+ *  \return number representation as integer (or byte)
+ */
 BYTE ProcessInputNumber(TCHAR* input, const BYTE& min, const BYTE& max)
 {
   auto temp = stoi(input);
