@@ -33,6 +33,9 @@ using namespace std;
 // just to shorten
 using InputTuple = tuple<basic_string<TCHAR>, BYTE, BYTE, BYTE, BYTE, BOOL>;
 
+constexpr BYTE MAP_ROWS = 126;
+constexpr BYTE MAP_COLS = 126;
+
 /************************************************
  *  Forward declaration
  ***********************************************/
@@ -85,7 +88,7 @@ int _tmain(int argc, TCHAR* argv[])
     return ERROR_INVALID_DATA;
   }
 
-  unique_ptr<AStar> pathFinder = make_unique<AStar>(mapPath, showmap);
+  unique_ptr<AStar> pathFinder = make_unique<AStar>(mapPath, MAP_COLS, MAP_ROWS, showmap);
   auto result = pathFinder->FindPath(startX, startY, endX, endY);
 
   cout << pathFinder << endl;
@@ -116,8 +119,8 @@ InputTuple ProcessInput(const int& argc, TCHAR* argv[])
   // map is grid 126 x 126, with start in 0, 0
   constexpr BYTE MIN_MAP_X = 0;
   constexpr BYTE MIN_MAP_Y = 0;
-  constexpr BYTE MAX_MAP_X = 126;
-  constexpr BYTE MAX_MAP_Y = 126;
+  constexpr BYTE MAX_MAP_X = MAP_COLS - 1;
+  constexpr BYTE MAX_MAP_Y = MAP_ROWS - 1;
 
   // value which is present if we show map
   LPCTSTR SHOW_MAP = _T("showmap");
