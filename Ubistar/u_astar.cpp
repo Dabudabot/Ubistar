@@ -26,7 +26,7 @@ using namespace chrono;
  *  AStar class impl
  ***********************************************/
 
-AStar::AStar(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap)
+AStar::AStar(const std::basic_string<TCHAR>& mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap)
   : m_Weight(1.0f), m_ShowMap(showmap), m_Duration(0), m_Cost(0), m_PathFound(false)
 {
   m_World = make_unique<World>(mapPath, mapRows, mapCols);
@@ -110,6 +110,10 @@ BOOL AStar::FindPath(BYTE startX, BYTE startY, BYTE endX, BYTE endY)
         neighbour->SetG(newG);
         neighbour->SetParent(current);
         neighbour->SetTravelCost(newG - current->GetG());
+
+        neighbour->SetH(CalcH(neighbour, m_End));
+        neighbour->MarkAsVisited();
+        open.push(neighbour);
       }
 
       // if we first time visit just mark it

@@ -108,7 +108,7 @@ VOID Coordinate::ResetValue()
  *  World class impl
  ***********************************************/
 
-World::World(std::basic_string<TCHAR> mapPath, size_t mapRows, size_t mapCols)
+World::World(const std::basic_string<TCHAR>& mapPath, size_t mapRows, size_t mapCols)
   : m_MapRows(mapRows), m_MapCols(mapCols), m_Coordinates(mapRows * mapCols, Coordinate())
 {
   // open file

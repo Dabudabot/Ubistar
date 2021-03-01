@@ -39,7 +39,7 @@ namespace ubistar
     * 
     *  \details also bunch of internal params initialized with default values
     */
-    AStar(std::basic_string<TCHAR> mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap);
+    AStar(const std::basic_string<TCHAR>& mapPath, BYTE mapRows, BYTE mapCols, BOOL showmap);
 
     /*!
     *  default dtor, no need to remove anything here by hand

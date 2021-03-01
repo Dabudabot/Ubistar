@@ -202,7 +202,7 @@ namespace ubistar
     *  \param mapRows max amount of rows
     *  \param mapCols max amoutn of cols
     */
-    World(std::basic_string<TCHAR> mapPath, size_t mapRows, size_t mapCols);
+    World(const std::basic_string<TCHAR>& mapPath, size_t mapRows, size_t mapCols);
 
     /*!
     *  default dtor, no need to free anything in this class by hand
